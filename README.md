@@ -35,12 +35,19 @@ $ yarn install
 ## Running the app
 
 ```bash
-# development
-$ yarn run start
+# run nestjs app 
+$ yarn start:dev
 
 # start postgresql container
 $ docker compose up dev1
 
-# production mode
-$ yarn run start:prod
+#create .env file add the database url : 
+# DATABASE_URL="postgresql://postgres:123@localhost:5434/nest?schema=public"
+
+# migrate database schema 
+$ npx prisma migrate dev
+
+# starting prisma studio
+$ npx prisma studio
+
 ```
