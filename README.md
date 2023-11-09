@@ -35,6 +35,12 @@ $ yarn install
 ## Running the app
 
 ```bash
+
+## custom script to start postgres in docker and push migrations
+## only use this once you understand the concept. 
+$ yarn db:dev:restart 
+
+
 # run nestjs app 
 $ yarn start:dev
 
