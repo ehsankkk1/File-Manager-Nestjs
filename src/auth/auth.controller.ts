@@ -1,22 +1,26 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
+import {
+    Body,
+    Controller,
+    HttpCode,
+    HttpStatus,
+    Post,
+    Req,
+  } from '@nestjs/common';
+  import { AuthService } from './auth.service';
+  import { AuthDto } from './dto';
 
-import { Controller, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
-
-@Controller({path : 'user'})
-export class AuthController {
-    constructor(private authService: AuthService){}
-
+  @Controller('auth')
+  export class AuthController {
+    constructor(private authService: AuthService) {}
+  
     @Post('signup')
-    signup(){
-        return this.authService.signup();
+    signup(@Body() dto: AuthDto) {
+      return this.authService.signup(dto);
     }
-    @Post('login')
-    login(){
-        return this.authService.login();
-
+  
+    @HttpCode(HttpStatus.OK)
+    @Post('signin')
+    signin(@Body() dto: AuthDto) {
+      return this.authService.signin(dto);
     }
-
- }
+  }
