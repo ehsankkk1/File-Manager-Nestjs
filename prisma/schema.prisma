@@ -18,6 +18,5 @@ model User {
   email String @unique()
   hash  String
 
-  firstName String?
-  lastName  String?
+  full_name String?
 }
