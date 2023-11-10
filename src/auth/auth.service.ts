@@ -7,12 +7,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable({})
 export class AuthService {
-    constructor(private prisma: PrismaService) {
-
-    }
+    constructor(
+        private prisma: PrismaService,
+        private jwt: JwtService,
+        private config: ConfigService,
+    ) { }
 
     async signin(dto: AuthDto) {
         // find the user by email
@@ -22,7 +26,7 @@ export class AuthService {
                     email: dto.email,
                 },
             });
-            
+
         // if user does not exist throw exception
         if (!user)
             throw new ForbiddenException(
@@ -37,7 +41,12 @@ export class AuthService {
                 'Credentials incorrect',
             );
         // Todo return user 
-        return { "userId": user.id, "email": user.email };
+        const token = await this.signToken(user.id, user.email);
+        return {
+            "userId": user.id,
+            "email": user.email,
+            "token": token
+        };
     }
 
     async signup(dto: AuthDto) {
@@ -52,7 +61,13 @@ export class AuthService {
                 },
             });
             // Todo return user 
-            return { "userId": user.id, "email": user.email };
+            const token = await this.signToken(user.id, user.email);
+            console.log(token);
+            return {
+                "userId": user.id,
+                "email": user.email,
+                "token": token
+            };
         } catch (error) {
             if (
                 error instanceof
@@ -66,5 +81,23 @@ export class AuthService {
             }
             throw error;
         }
+    }
+
+    async signToken(userId: number, email: string)
+        : Promise<string> {
+        const payload = {
+            sub: userId,
+            email,
+        };
+        const secret = this.config.get('JWT_SECRET');
+
+        const token = await this.jwt.signAsync(
+            payload,
+            {
+                expiresIn: '15d',
+                secret: secret,
+            },
+        );
+        return token;
     }
 }

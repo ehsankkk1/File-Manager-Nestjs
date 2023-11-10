@@ -48,7 +48,10 @@ $ yarn start:dev
 $ docker compose up dev1
 
 #create .env file add the database url : 
+## .env
+
 # DATABASE_URL="postgresql://postgres:123@localhost:5434/nest?schema=public"
+# JWT_SECRET='super-secret'
 
 # migrate database schema 
 $ npx prisma migrate dev
