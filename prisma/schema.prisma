@@ -18,5 +18,74 @@ model User {
   email String @unique()
   hash  String
 
-  full_name String?
+  fullName String?
+
+  fileEvents        FileEvent[]
+  files             File[]
+  folderPermissions FolderPermission[]
+
+  @@map("users")
+}
+
+model FileEvent {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //enum: updated , deleted , created
+  eventName String
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  fileId Int
+  File   File @relation(fields: [fileId], references: [id])
+
+  @@map("fileEvents")
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title  String?
+  status String?
+  link   String?
+
+  fileEvent FileEvent[]
+
+  userId   Int
+  User     User    @relation(fields: [userId], references: [id])
+  Folder   Folder? @relation(fields: [folderId], references: [id])
+  folderId Int?
+
+  @@map("files")
+}
+
+model Folder {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String?
+
+  files             File[]
+  folderPermissions FolderPermission[]
+
+  @@map("folders")
+}
+
+model FolderPermission {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Folder   Folder? @relation(fields: [folderId], references: [id])
+  folderId Int?
+
+  User     User?   @relation(fields: [userId], references: [id])
+  userId   Int?
+
+  @@map("folderPermissions")
 }
