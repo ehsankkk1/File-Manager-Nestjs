@@ -3,41 +3,45 @@ import { Injectable } from "@nestjs/common";
 import { User, File } from "@prisma/client";
 import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
 import { FolderService } from "src/folder/folder.service";
+import { GetFileByFolderDto } from "src/file/dto";
 
 export enum Action {
-    Manage = 'manage', /// do everything
+    Manage = 'manage', /// do everything basicly.
     Create = 'create',
     Read = 'read',
     Update = 'update',
     Delete = 'delete',
+    CheckIn = 'checkIn',
+    CheckOut = 'checkOut',
 }
-type AppSubjects = 'all' | Subjects<{
+export type AppSubjects = 'all' | Subjects<{
     'User': User,
     'File': File
 }>;
-type AppAbility = PureAbility<[Action, AppSubjects], PrismaQuery>;
+export type AppAbility = PureAbility<[Action, AppSubjects], PrismaQuery>;
 
 @Injectable()
 export class CaslAbilityFactory {
-    constructor(private folderService: FolderService){}
+    constructor(private folderService: FolderService) { }
 
-    async defineAbility(user: User) {
-        const {can , cannot , build} = new AbilityBuilder<AppAbility>(createPrismaAbility);
+    async defineFolderAccessAbility(user: User, dto: GetFileByFolderDto) {
+        const { can, cannot, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
 
-        const havePermission = await this.folderService.checkFolderPermission(user.id,1);
+        // check if user have permission in permission table
+        const havePermission = await this.folderService.checkFolderPermission(user.id, dto.folderId);
 
-        if(havePermission){
-            console.log("Yes I can");
-            can(Action.Manage, "User");
-        }else{
-            console.log("no I can't");
-            cannot(Action.Manage, "User");
-            cannot(Action.Read, "User");
-            cannot(Action.Create, "User");
-            cannot(Action.Update, "User");
-            cannot(Action.Delete, "User");
-
+        if (havePermission) {
+            can(Action.Manage, "File");
+        } else {
+            cannot(Action.Manage, "File");
+            cannot(Action.Read, "File");
+            cannot(Action.Create, "File");
+            cannot(Action.Update, "File");
+            cannot(Action.Delete, "File");
+            cannot(Action.CheckIn, "File");
+            cannot(Action.CheckOut, "File");
         }
+
         return build();
     }
 }

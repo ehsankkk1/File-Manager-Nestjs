@@ -3,8 +3,6 @@ https://docs.nestjs.com/providers#services
 */
 
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { use } from 'passport';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
