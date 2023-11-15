@@ -10,6 +10,7 @@ export class FolderService {
 
     constructor(private prisma: PrismaService) { }
     
+    // check if user has permissions to access folder 
     async checkFolderPermission(user: number, folder: number): Promise<boolean> {
 
         const canUserAccess = await this.prisma.folderPermission.findFirst({

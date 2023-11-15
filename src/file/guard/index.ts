@@ -1,2 +1,2 @@
 
-export * from './ability.guard';
+export * from './file_ability.guard';

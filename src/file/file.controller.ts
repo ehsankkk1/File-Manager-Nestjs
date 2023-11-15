@@ -9,8 +9,8 @@ import { Action, CaslAbilityFactory } from 'src/casl/casl-ability.factory';
 import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
 import { GetFileByFolderDto } from './dto';
-import { CheckAbilities } from 'src/file/decorator';
-import { AbilityGuard } from 'src/file/guard';
+import { CheckAbilities } from 'src/casl/decorator';
+import { FileAbilityGuard } from 'src/file/guard';
 
 @UseGuards(JwtGuard)
 @Controller('files')
@@ -21,7 +21,7 @@ export class FileController {
     ) { }
 
     @Get()
-    @UseGuards(AbilityGuard)
+    @UseGuards(FileAbilityGuard)
     @CheckAbilities({ action: Action.Read, subject: "File" })
     async getFilesByFolderId(@GetUser() user: User, @Query() dto: GetFileByFolderDto) {
 

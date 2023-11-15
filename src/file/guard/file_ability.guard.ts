@@ -1,14 +1,14 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
 import { AppAbility, CaslAbilityFactory } from "../../casl/casl-ability.factory";
 import { Reflector } from "@nestjs/core";
-import { CHECK_ABILITY_KEY, RequiredRule } from "../decorator";
+import { CHECK_ABILITY_KEY, RequiredRule } from "../../casl/decorator";
 import { ForbiddenError } from "@casl/ability";
 import { GetFileByFolderDto } from "src/file/dto";
 import { plainToClass } from "class-transformer";
 
 
 @Injectable()
-export class AbilityGuard implements CanActivate {
+export class FileAbilityGuard implements CanActivate {
     constructor(
         private reflector: Reflector,
         private caslAbilityFactory: CaslAbilityFactory,
