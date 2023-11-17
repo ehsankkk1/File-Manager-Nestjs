@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { CaslAbilityFactory } from './casl-ability.factory';
+import { FileAbilityFactory } from './file.ability.factory';
 import { FolderModule } from 'src/folder/folder.module';
 
 @Module({
-  providers: [CaslAbilityFactory],
-  exports: [CaslAbilityFactory],
+  providers: [FileAbilityFactory],
+  exports: [FileAbilityFactory],
   imports: [FolderModule]
 })
 export class CaslModule {}

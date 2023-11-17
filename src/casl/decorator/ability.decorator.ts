@@ -1,5 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
-import { Action, AppSubjects } from "../casl-ability.factory";
+import { Action, AppSubjects } from "../variables";
 //import { Subjects } from '@casl/prisma';
 
 

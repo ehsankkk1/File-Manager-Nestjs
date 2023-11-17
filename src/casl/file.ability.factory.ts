@@ -1,30 +1,17 @@
 import { AbilityBuilder, ExtractSubjectType, PureAbility } from "@casl/ability";
 import { Injectable } from "@nestjs/common";
-import { User, File } from "@prisma/client";
+import { User } from "@prisma/client";
 import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
 import { FolderService } from "src/folder/folder.service";
 import { GetFileByFolderDto } from "src/file/dto";
+import { Action, AppAbility } from "./variables";
 
-export enum Action {
-    Manage = 'manage', /// do everything basicly.
-    Create = 'create',
-    Read = 'read',
-    Update = 'update',
-    Delete = 'delete',
-    CheckIn = 'checkIn',
-    CheckOut = 'checkOut',
-}
-export type AppSubjects = 'all' | Subjects<{
-    'User': User,
-    'File': File
-}>;
-export type AppAbility = PureAbility<[Action, AppSubjects], PrismaQuery>;
 
 @Injectable()
-export class CaslAbilityFactory {
+export class FileAbilityFactory {
     constructor(private folderService: FolderService) { }
 
-    async defineFolderAccessAbility(user: User, dto: GetFileByFolderDto) {
+    async defineFileAbility(user: User, dto: GetFileByFolderDto) {
         const { can, cannot, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
 
         // check if user have permission in permission table

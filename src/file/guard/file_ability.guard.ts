@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
-import { AppAbility, CaslAbilityFactory } from "../../casl/casl-ability.factory";
+import { FileAbilityFactory } from "../../casl/file.ability.factory";
 import { Reflector } from "@nestjs/core";
 import { CHECK_ABILITY_KEY, RequiredRule } from "../../casl/decorator";
 import { ForbiddenError } from "@casl/ability";
@@ -11,7 +11,7 @@ import { plainToClass } from "class-transformer";
 export class FileAbilityGuard implements CanActivate {
     constructor(
         private reflector: Reflector,
-        private caslAbilityFactory: CaslAbilityFactory,
+        private fileAbilityFactory: FileAbilityFactory,
     ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -27,7 +27,7 @@ export class FileAbilityGuard implements CanActivate {
         const dto = plainToClass(GetFileByFolderDto, request.query);
 
         //checking ability for the folder access
-        const ability = await this.caslAbilityFactory.defineFolderAccessAbility(user, dto);
+        const ability = await this.fileAbilityFactory.defineFileAbility(user, dto);
 
         // check for every rule and match with ability
         try {
