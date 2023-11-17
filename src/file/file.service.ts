@@ -4,7 +4,7 @@ https://docs.nestjs.com/providers#services
 
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { FileAbilityFactory } from 'src/casl/file.ability.factory';
+import { FileAbilityFactory } from 'src/abilities/file.ability.factory';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetFileByFolderDto } from './dto';
 

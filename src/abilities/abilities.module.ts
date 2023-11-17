@@ -7,4 +7,4 @@ import { FolderModule } from 'src/folder/folder.module';
   exports: [FileAbilityFactory],
   imports: [FolderModule]
 })
-export class CaslModule {}
+export class AbilitiesModule {}

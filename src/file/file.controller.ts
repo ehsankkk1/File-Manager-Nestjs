@@ -5,13 +5,13 @@ https://docs.nestjs.com/controllers#controllers
 import { Controller, ForbiddenException, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { FileService } from './file.service';
 import { JwtGuard } from '../auth/guard';
-import { FileAbilityFactory } from 'src/casl/file.ability.factory';
+import { FileAbilityFactory } from 'src/abilities/file.ability.factory';
 import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
 import { GetFileByFolderDto } from './dto';
-import { CheckAbilities } from 'src/casl/decorator';
+import { CheckAbilities } from 'src/abilities/decorator';
 import { FileAbilityGuard } from 'src/file/guard';
-import { Action } from 'src/casl/variables';
+import { Action } from 'src/abilities/variables';
 
 @UseGuards(JwtGuard)
 @Controller('files')

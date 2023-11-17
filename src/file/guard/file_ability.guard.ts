@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
-import { FileAbilityFactory } from "../../casl/file.ability.factory";
+import { FileAbilityFactory } from "../../abilities/file.ability.factory";
 import { Reflector } from "@nestjs/core";
-import { CHECK_ABILITY_KEY, RequiredRule } from "../../casl/decorator";
+import { CHECK_ABILITY_KEY, RequiredRule } from "../../abilities/decorator";
 import { ForbiddenError } from "@casl/ability";
 import { GetFileByFolderDto } from "src/file/dto";
 import { plainToClass } from "class-transformer";
