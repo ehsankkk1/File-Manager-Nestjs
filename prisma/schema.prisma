@@ -22,6 +22,7 @@ model User {
 
   fileEvents        FileEvent[]
   files             File[]
+  folders             Folder[]
   folderPermissions FolderPermission[]
 
   @@map("users")
@@ -72,6 +73,9 @@ model Folder {
 
   files             File[]
   folderPermissions FolderPermission[]
+
+  userId   Int
+  User     User    @relation(fields: [userId], references: [id])
 
   @@map("folders")
 }

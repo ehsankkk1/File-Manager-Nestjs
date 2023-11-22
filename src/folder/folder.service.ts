@@ -29,7 +29,7 @@ export class FolderService {
     async addFolder(dto: FolderDto) {
         const folder = await this.prisma.folder.create({
             data: {
-                title: dto.name
+                title: dto.name,
             }
         })
         return folder;
