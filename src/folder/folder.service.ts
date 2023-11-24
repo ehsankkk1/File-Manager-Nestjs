@@ -5,6 +5,7 @@ https://docs.nestjs.com/providers#services
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FolderDto } from './dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class FolderService {
@@ -26,10 +27,11 @@ export class FolderService {
 
         return false;
     }
-    async addFolder(dto: FolderDto) {
+    async addFolder(dto: FolderDto, user: User) {
         const folder = await this.prisma.folder.create({
             data: {
                 title: dto.name,
+                userId: user.id
             }
         })
         return folder;
