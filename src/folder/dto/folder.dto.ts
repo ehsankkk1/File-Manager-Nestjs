@@ -1,7 +1,15 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
-export class FolderDto {
+export class AddFolderDto {
     @IsString()
     @IsNotEmpty()
     name: string
+
+}
+export class DeleteFolderDto {
+    @IsInt()
+    @Type(() => Number)
+    @IsNotEmpty()
+    id: number
 }
