@@ -2,12 +2,11 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable } from '@nestjs/common';
-import { User, File } from '@prisma/client';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { FileAbilityFactory } from 'src/abilities/file.ability.factory';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetFileByFolderDto, CreateFileDto, UpdateFileDto } from './dto';
-import { GetUser } from 'src/auth/decorator';
 
 @Injectable()
 export class FileService {
@@ -25,11 +24,11 @@ export class FileService {
   }
 
 
-  async createFile(dto: CreateFileDto, user: User) {
+  async createFile(dto: CreateFileDto, link: string, user: User) {
     const file = await this.prisma.file.create({
       data: {
         title: dto.title,
-        link: dto.link,
+        link: link,
         user: {
           connect: {
             id: user.id,
@@ -46,6 +45,24 @@ export class FileService {
         id: id,
       }
     });
+  }
+
+  async updateFile(id: number, updateFileDto: UpdateFileDto, link: string, user: User) {
+
+    try{
+      return await this.prisma.file.update({
+        where: { id: id },
+        data: {
+          title: updateFileDto.title,
+          link: link,
+        },
+      });
+    }catch(e){
+      // check if file not availabel error
+      if(e.code == 'P2025'){
+        throw new ForbiddenException("File not found");
+      }
+    }
   }
 
   checkinfile(id: number, user: User) {
@@ -82,11 +99,6 @@ export class FileService {
         }
       }
     });
-  }
-
-
-  update(id: number, updateFileDto: UpdateFileDto, user: User) {
-
   }
 
   remove(id: number) {

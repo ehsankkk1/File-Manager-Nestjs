@@ -13,6 +13,7 @@ import { CheckAbilities } from 'src/abilities/decorator';
 import { FileAbilityGuard } from 'src/file/guard';
 import { Action } from 'src/abilities/variables';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
+import { FileValidationUploadInterceptor } from './interceptor/fileValidationUpload.interceptor';
 
 @UseGuards(JwtGuard)
 @Controller('files')
@@ -37,49 +38,27 @@ export class FileController {
     }
 
     @Patch('update-file/:id')
+    @UseInterceptors(FileValidationUploadInterceptor)
     @UseInterceptors(FileInterceptor('file'))
-    async updateFile(@UploadedFile(new ParseFilePipe({
-        validators: [
-            new MaxFileSizeValidator({ maxSize: 3000000 }),
-        ]
-    })) file: Express.Multer.File,
+
+    async updateFile(
+        @UploadedFile() file: Express.Multer.File,
         @GetUser() user: User,
         @Param('id', ParseIntPipe) id: number,
-        @Body() body
+        @Body() dto: UpdateFileDto
     ) {
-        const existingFile = await this.fileService.findById(id);
-        let newFilePath = existingFile.link;
-        const fs = require('fs');
-
-        if (file) {
-            // If a new file is uploaded, remove the old file and save the new one
-            await fs.unlinkSync(existingFile.link);
-            newFilePath = file.path;
-        }
-
-        const updatedFile = new UpdateFileDto();
-        updatedFile.title = body.title;
-        updatedFile.link = newFilePath;
-
-        this.fileService.update(id, updatedFile, user);
-        return { message: 'File updated successfully' };
+        return this.fileService.updateFile(id, dto, file.path, user);
     }
 
-    //upload file with validation on file size
     @Post('upload-file')
+    @UseInterceptors(FileValidationUploadInterceptor)
     @UseInterceptors(FileInterceptor('file'))
-    async uploadFile(@UploadedFile(new ParseFilePipe({
-        validators: [
-            new MaxFileSizeValidator({ maxSize: 3000000 }),
-        ]
-    })) file: Express.Multer.File,
+    async uploadFile(
+        @UploadedFile() file: Express.Multer.File,
         @GetUser() user: User,
-        @Body() body
+        @Body() dto: CreateFileDto
     ) {
-        const dto = new CreateFileDto();
-        dto.title = body.title;
-        dto.link = file.path
-        return this.fileService.createFile(dto, user);
+        return this.fileService.createFile(dto, file.path, user);
     }
 
 
