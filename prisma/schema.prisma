@@ -22,10 +22,18 @@ model User {
 
   fileEvents        FileEvent[]
   files             File[]
-  folders             Folder[]
+  folders           Folder[]
   folderPermissions FolderPermission[]
 
   @@map("users")
+}
+ 
+enum EventName{
+  updated
+  deleted
+  created
+  checkedin
+  checkedout
 }
 
 model FileEvent {
@@ -33,14 +41,14 @@ model FileEvent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  //enum: updated , deleted , created
-  eventName String
+  //enum: updated , deleted , created, checkedin, checkedout
+  eventName EventName
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
   fileId Int
-  File   File @relation(fields: [fileId], references: [id])
+  file   File @relation(fields: [fileId], references: [id])
 
   @@map("fileEvents")
 }
@@ -51,14 +59,14 @@ model File {
   updatedAt DateTime @updatedAt
 
   title  String?
-  status String?
+  isAvailable Boolean @default(true)
   link   String?
 
   fileEvent FileEvent[]
 
   userId   Int
-  User     User    @relation(fields: [userId], references: [id])
-  Folder   Folder? @relation(fields: [folderId], references: [id])
+  user     User    @relation(fields: [userId], references: [id])
+  folder   Folder? @relation(fields: [folderId], references: [id])
   folderId Int?
 
   @@map("files")
@@ -74,8 +82,8 @@ model Folder {
   files             File[]
   folderPermissions FolderPermission[]
 
-  userId   Int
-  User     User    @relation(fields: [userId], references: [id])
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
   @@map("folders")
 }
@@ -85,11 +93,11 @@ model FolderPermission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Folder   Folder? @relation(fields: [folderId], references: [id])
+  folder   Folder? @relation(fields: [folderId], references: [id])
   folderId Int?
 
-  User     User?   @relation(fields: [userId], references: [id])
-  userId   Int?
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
 
   @@map("folderPermissions")
 }
