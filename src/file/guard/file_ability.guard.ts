@@ -1,10 +1,8 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, Logger } from "@nestjs/common";
 import { FileAbilityFactory } from "../../abilities/file.ability.factory";
 import { Reflector } from "@nestjs/core";
 import { CHECK_ABILITY_KEY, RequiredRule } from "../../abilities/decorator";
 import { ForbiddenError } from "@casl/ability";
-import { GetFileByFolderDto } from "src/file/dto";
-import { plainToClass } from "class-transformer";
 
 
 @Injectable()
@@ -24,10 +22,11 @@ export class FileAbilityGuard implements CanActivate {
         // get informations from the request 
         const request = context.switchToHttp().getRequest();
         const user = request.user;
-        const dto = plainToClass(GetFileByFolderDto, request.query);
+        const folderId = parseInt(request.params.folderId);
+        const fileId = parseInt(request.params.id);
 
         //checking ability for the folder access
-        const ability = await this.fileAbilityFactory.defineFileAbility(user, dto);
+        const ability = await this.fileAbilityFactory.defineFileAbility(user, folderId, fileId);
 
         // check for every rule and match with ability
         try {

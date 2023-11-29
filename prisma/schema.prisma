@@ -17,6 +17,7 @@ model User {
 
   email String @unique()
   hash  String
+  isAdmin Boolean @default(false)
 
   fullName String?
 
@@ -28,19 +29,27 @@ model User {
   @@map("users")
 }
 
+enum EventName {
+  updated
+  deleted
+  created
+  checkedin
+  checkedout
+}
+
 model FileEvent {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  //enum: updated , deleted , created
-  eventName String
+  //enum: updated , deleted , created, checkedin, checkedout
+  eventName EventName
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
 
   fileId Int
-  File   File @relation(fields: [fileId], references: [id])
+  file   File @relation(fields: [fileId], references: [id])
 
   @@map("fileEvents")
 }
@@ -50,16 +59,16 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title  String?
-  status String?
-  link   String?
+  title       String?
+  isAvailable Boolean @default(true)
+  link        String?
 
   fileEvent FileEvent[]
 
   userId   Int
-  User     User    @relation(fields: [userId], references: [id])
-  Folder   Folder? @relation(fields: [folderId], references: [id])
-  folderId Int?
+  user     User   @relation(fields: [userId], references: [id])
+  folder   Folder @relation(fields: [folderId], references: [id])
+  folderId Int
 
   @@map("files")
 }
@@ -75,7 +84,7 @@ model Folder {
   folderPermissions FolderPermission[]
 
   userId Int
-  User   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
   @@map("folders")
 }
@@ -85,11 +94,11 @@ model FolderPermission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Folder   Folder? @relation(fields: [folderId], references: [id])
-  folderId Int?
+  folder   Folder @relation(fields: [folderId], references: [id])
+  folderId Int
 
-  User   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
 
   @@map("folderPermissions")
 }
