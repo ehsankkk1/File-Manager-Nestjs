@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { LoggingInterceptor } from './global/interceptor/globalLogger.interceptor';
 
 async function bootstrap() {
 
@@ -11,6 +12,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  app.useGlobalInterceptors(new LoggingInterceptor());
   await app.listen(3333);
   const server = app.getHttpServer();
   const router = server._events.request._router;

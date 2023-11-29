@@ -17,7 +17,6 @@ import { AbilitiesModule } from './abilities/abilities.module';
     UserModule,
     FileModule,
     AbilitiesModule,
-
   ],
 })
 export class AppModule { }
