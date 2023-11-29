@@ -24,9 +24,3 @@ export class UpdateFolderDto {
     name: string
 
 }
-export class DeleteFolderDto {
-    @IsInt()
-    @Type(() => Number)
-    @IsNotEmpty()
-    id: number
-}
