@@ -4,7 +4,7 @@ https://docs.nestjs.com/providers#services
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddFolderDto, DeleteFolderDto } from './dto';
+import { AddFolderDto, DeleteFolderDto, UpdateFolderDto } from './dto';
 import { User } from '@prisma/client';
 
 @Injectable()
@@ -58,5 +58,28 @@ export class FolderService {
             return "You Cannot Delete This Folder!"
         }
     }
+    async updateFolder(dto: UpdateFolderDto, user: User) {
+        var folder = await this.prisma.folder.findUnique({
+            where: {
+                id: dto.id
+            }
+        })
+        if (folder == null) {
+            return "Not Found"
+        }
+        else if (folder.userId == user.id) {
 
+            await this.prisma.folder.update({
+                where: {
+                    id: dto.id
+                },
+                data: {
+                    title: dto.name
+                }
+            });
+            return 'Updated Successfully';
+        } else {
+            return "You Cannot Update This Folder!"
+        }
+    }
 }

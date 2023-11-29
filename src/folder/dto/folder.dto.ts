@@ -13,3 +13,20 @@ export class DeleteFolderDto {
     @IsNotEmpty()
     id: number
 }
+export class UpdateFolderDto {
+    @IsInt()
+    @Type(() => Number)
+    @IsNotEmpty()
+    id: number
+
+    @IsString()
+    @IsNotEmpty()
+    name: string
+
+}
+export class DeleteFolderDto {
+    @IsInt()
+    @Type(() => Number)
+    @IsNotEmpty()
+    id: number
+}
