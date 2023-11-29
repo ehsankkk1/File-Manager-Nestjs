@@ -22,6 +22,7 @@ export class UpdateFolderDto {
     @IsString()
     @IsNotEmpty()
     name: string
+
 }
 export class AddUserToFolderDto {
     @IsInt()

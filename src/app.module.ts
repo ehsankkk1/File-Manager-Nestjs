@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { AbilitiesModule } from './abilities/abilities.module';
+import { FileEventModule } from './file-event/file-event.module';
 @Module({
   imports: [
     FolderModule,
@@ -17,6 +18,7 @@ import { AbilitiesModule } from './abilities/abilities.module';
     UserModule,
     FileModule,
     AbilitiesModule,
+    FileEventModule,
   ],
 })
 export class AppModule { }
