@@ -29,9 +29,6 @@ export class FileAbilityFactory {
             can(Action.Read, "File");
             can(Action.Create, "File");
             can(Action.Update, "File");
-        } else {
-            cannot(Action.Manage, "File");
-            return build();
         }
 
         // check if there is file id passed
