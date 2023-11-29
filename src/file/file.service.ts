@@ -16,7 +16,7 @@ export class FileService {
     private fileEventService: FileEventService
   ) { }
 
-  async getFiles(user: User, folderId: number) {
+  async getFiles(folderId: number) {
 
     return this.prisma.file.findMany({
       where: {
@@ -26,10 +26,14 @@ export class FileService {
 
   }
 
-  findById(id: number) {
+  findById(folderId: number,id: number) {
     return this.prisma.file.findFirst({
       where: {
         id: id,
+        folderId: folderId,
+      },
+      include: {
+        fileEvent: true,
       }
     });
   }
@@ -84,7 +88,7 @@ export class FileService {
         where: { id: Number(id) },
         data: { isAvailable: false },
       });
-      await this.fileEventService.createFileEvent(FileEventEnum.CheckOut, user, id);
+      await this.fileEventService.createFileEvent(FileEventEnum.CheckIn, user, id);
       return file;
     } catch (e) {
       if (e.code == 'P2025') {
@@ -99,7 +103,7 @@ export class FileService {
       where: { id: Number(id) },
       data: { isAvailable: true },
     });
-    await this.fileEventService.createFileEvent(FileEventEnum.CheckIn, user, id)
+    await this.fileEventService.createFileEvent(FileEventEnum.CheckOut, user, id)
     return file;
     }catch (e) {
       if (e.code == 'P2025') {

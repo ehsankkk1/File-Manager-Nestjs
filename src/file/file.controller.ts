@@ -24,15 +24,27 @@ export class FileController {
     @UseGuards(FileAbilityGuard)
     @CheckAbilities({ action: Action.Read, subject: "File" })
     async getFilesByFolderId(
-        @GetUser() user: User,
         @Param('folderId', ParseIntPipe) folderId: number
     ) {
-        return this.fileService.getFiles(user, folderId);
+        return this.fileService.getFiles(folderId);
     }
+
+    @Get('get-files/:id')
+    @UseGuards(FileAbilityGuard)
+    @CheckAbilities({ action: Action.Read, subject: "File" })
+    async getFileById(
+        @Param('id', ParseIntPipe) fileId: number,
+        @Param('folderId', ParseIntPipe) folderId: number
+    ) {
+        return this.fileService.findById(folderId, fileId);
+    }
+
 
     @Patch('update-file/:id')
     @UseInterceptors(FileValidationUploadInterceptor)
     @UseInterceptors(FileInterceptor('file'))
+    @UseGuards(FileAbilityGuard)
+    @CheckAbilities({ action: Action.Update, subject: "File" })
     async updateFile(
         @UploadedFile() file: Express.Multer.File,
         @GetUser() user: User,
@@ -45,6 +57,8 @@ export class FileController {
     @Post('upload-file')
     @UseInterceptors(FileValidationUploadInterceptor)
     @UseInterceptors(FileInterceptor('file'))
+    @UseGuards(FileAbilityGuard)
+    @CheckAbilities({ action: Action.Create, subject: "File" })
     async uploadFile(
         @UploadedFile() file: Express.Multer.File,
         @GetUser() user: User,
@@ -65,6 +79,8 @@ export class FileController {
 
     //checkin file
     @Post('checkin-file/:id')
+    @UseGuards(FileAbilityGuard)
+    @CheckAbilities({ action: Action.CheckIn, subject: "File" })
     checkInFile(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User
@@ -74,6 +90,8 @@ export class FileController {
 
     //checkout file
     @Post('checkout-file/:id')
+    @UseGuards(FileAbilityGuard)
+    @CheckAbilities({ action: Action.CheckOut, subject: "File" })
     checkoutFile(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User
@@ -82,16 +100,13 @@ export class FileController {
     }
 
     @Delete(':id')
+    @UseGuards(FileAbilityGuard)
+    @CheckAbilities({ action: Action.Delete, subject: "File" })
     remove(@Param('id') id: string) {
         return this.fileService.remove(+id);
     }
 
 
 
-    // i don't think we will need this route in the frontend
-    // //return a resource of a file from database
-    // @Get(':id')
-    // findOne(@Param('id') id: string) {
-    //     return this.fileService.findById(+id);
-    // }
+
 }

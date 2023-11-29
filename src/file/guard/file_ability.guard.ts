@@ -23,10 +23,10 @@ export class FileAbilityGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
         const folderId = parseInt(request.params.folderId);
-        Logger.debug(folderId);
+        const fileId = parseInt(request.params.id);
 
         //checking ability for the folder access
-        const ability = await this.fileAbilityFactory.defineFileAbility(user, folderId);
+        const ability = await this.fileAbilityFactory.defineFileAbility(user, folderId, fileId);
 
         // check for every rule and match with ability
         try {

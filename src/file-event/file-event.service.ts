@@ -11,7 +11,6 @@ export class FileEventService {
 
     @UseInterceptors(LoggingInterceptor)
     createFileEvent(fileEvent: FileEventEnum, user: User, id: number) {
-        Logger.log("Hellllllll");
         return this.prisma.fileEvent.create({
             data: {
                 eventName: fileEvent,
