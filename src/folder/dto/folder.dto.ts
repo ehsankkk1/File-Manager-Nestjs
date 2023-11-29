@@ -23,3 +23,14 @@ export class UpdateFolderDto {
     @IsNotEmpty()
     name: string
 }
+export class AddUserToFolderDto {
+    @IsInt()
+    @Type(() => Number)
+    @IsNotEmpty()
+    folderId: number
+
+    @IsInt()
+    @Type(() => Number)
+    @IsNotEmpty()
+    userId: number
+}
