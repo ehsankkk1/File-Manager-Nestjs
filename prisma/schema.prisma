@@ -27,8 +27,8 @@ model User {
 
   @@map("users")
 }
- 
-enum EventName{
+
+enum EventName {
   updated
   deleted
   created
@@ -58,16 +58,16 @@ model File {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  title  String?
+  title       String?
   isAvailable Boolean @default(true)
-  link   String?
+  link        String?
 
   fileEvent FileEvent[]
 
   userId   Int
-  user     User    @relation(fields: [userId], references: [id])
-  folder   Folder? @relation(fields: [folderId], references: [id])
-  folderId Int?
+  user     User   @relation(fields: [userId], references: [id])
+  folder   Folder @relation(fields: [folderId], references: [id])
+  folderId Int
 
   @@map("files")
 }
@@ -93,11 +93,11 @@ model FolderPermission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  folder   Folder? @relation(fields: [folderId], references: [id])
-  folderId Int?
+  folder   Folder @relation(fields: [folderId], references: [id])
+  folderId Int
 
-  user   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
 
   @@map("folderPermissions")
 }

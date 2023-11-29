@@ -4,7 +4,7 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 
-export class GetFileByFolderDto {
+export class FolderIdQueryDto {
 
   @IsInt()
   @Type(() => Number)

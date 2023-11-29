@@ -20,17 +20,11 @@ export class LoggingInterceptor implements NestInterceptor {
 
         return next.handle().pipe(
             tap(() => {
-                Logger.log(`Method ${method} completed in ${Date.now() - now}ms`);
+                Logger.debug(`Method ${method} completed in ${Date.now() - now}ms`);
             }),
             catchError((error) => {
-                Logger.error(`Error in ${method}:`, error);
-
-                // Log additional error tracking information here
-                // For example, you can log request and response details
-                //Logger.error(`The Request is ${request}:`);
-
-                // Rethrow the error to propagate it to the next handler
-                return throwError(new BadGatewayException('Something went wrong'));
+                Logger.error(`Error in ${method}`, error);
+                return throwError(() => error);                // Log additional error tracking information here
             }),
         );
     }

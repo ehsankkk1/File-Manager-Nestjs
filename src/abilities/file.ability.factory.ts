@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
 import { FolderService } from "src/folder/folder.service";
-import { GetFileByFolderDto } from "src/file/dto";
+import { FolderIdQueryDto } from "src/file/dto";
 import { Action, AppAbility } from "./variables";
 
 
@@ -11,11 +11,11 @@ import { Action, AppAbility } from "./variables";
 export class FileAbilityFactory {
     constructor(private folderService: FolderService) { }
 
-    async defineFileAbility(user: User, dto: GetFileByFolderDto) {
+    async defineFileAbility(user: User, folderId: number) {
         const { can, cannot, build } = new AbilityBuilder<AppAbility>(createPrismaAbility);
 
         // check if user have permission in permission table
-        const havePermission = await this.folderService.checkFolderPermission(user.id, dto.folderId);
+        const havePermission = await this.folderService.checkFolderPermission(user.id, folderId);
 
         if (havePermission) {
             can(Action.Manage, "File");
