@@ -3,8 +3,6 @@ import { FileAbilityFactory } from "../../abilities/file.ability.factory";
 import { Reflector } from "@nestjs/core";
 import { CHECK_ABILITY_KEY, RequiredRule } from "../../abilities/decorator";
 import { ForbiddenError } from "@casl/ability";
-import { FolderIdQueryDto } from "src/file/dto";
-import { plainToClass } from "class-transformer";
 
 
 @Injectable()

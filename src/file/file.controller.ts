@@ -65,13 +65,19 @@ export class FileController {
 
     //checkin file
     @Post('checkin-file/:id')
-    checkInFile(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
+    checkInFile(
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: User
+    ) {
         return this.fileService.checkinfile(id, user);
     }
 
     //checkout file
     @Post('checkout-file/:id')
-    checkoutFile(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
+    checkoutFile(
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: User
+    ) {
         return this.fileService.checkoutfile(id, user);
     }
 

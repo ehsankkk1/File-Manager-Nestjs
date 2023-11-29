@@ -3,7 +3,6 @@ import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
 import { FolderService } from "src/folder/folder.service";
-import { FolderIdQueryDto } from "src/file/dto";
 import { Action, AppAbility } from "./variables";
 
 

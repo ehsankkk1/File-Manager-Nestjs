@@ -5,7 +5,7 @@ https://docs.nestjs.com/providers#services
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FolderIdQueryDto, CreateFileDto, UpdateFileDto } from './dto';
+import { CreateFileDto, UpdateFileDto } from './dto';
 import { FileEventService } from 'src/file-event/file-event.service';
 import { FileEventEnum } from 'src/file-event/enum';
 
