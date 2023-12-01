@@ -23,6 +23,13 @@ export class FolderService {
         }
         return false;
     }
+    findById(folderId: number) {
+        return this.prisma.folder.findFirst({
+            where: {
+                id: folderId
+            },
+        });
+    }
     async addFolder(dto: AddFolderDto, user: User) {
         const folder = await this.prisma.folder.create({
             data: {

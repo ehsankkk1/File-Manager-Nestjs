@@ -8,18 +8,28 @@ import { AddFolderDto, AddUserToFolderDto, DeleteFolderDto, UpdateFolderDto } fr
 import { FolderService } from './folder.service';
 import { JwtGuard } from 'src/auth/guard';
 import { GetUser } from 'src/auth/decorator';
+import { FolderAbilityFactory } from 'src/abilities/folder.ability.factory';
+
 
 @UseGuards(JwtGuard)
 @Controller('folders')
 export class FolderController {
-    constructor(private folderService: FolderService) { }
+    constructor(private folderService: FolderService, private folderAbilityFactory: FolderAbilityFactory) {
+
+    }
+
+
+
     @Post('add')
     addFolder(@Body() dto: AddFolderDto, @GetUser() user: User) {
         return this.folderService.addFolder(dto, user)
     }
     @Delete('delete')
-    deleteFolder(@Body() dto: DeleteFolderDto, @GetUser() user: User) {
-        return this.folderService.deleteFolder(dto, user)
+    async deleteFolder(@Body() dto: DeleteFolderDto, @GetUser() user: User) {
+        const ability = await this.folderAbilityFactory.defineFolderAbility(user, dto.id);
+        console.log(ability);
+        return ability;
+        //return this.folderService.deleteFolder(dto, user)
     }
     @Post('update')
     updateFolder(@Body() dto: UpdateFolderDto, @GetUser() user: User) {

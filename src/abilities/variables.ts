@@ -1,6 +1,6 @@
 import { PureAbility } from '@casl/ability';
 import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
-import { User, File } from "@prisma/client";
+import { User, File, Folder } from "@prisma/client";
 
 
 export enum Action {
@@ -14,6 +14,7 @@ export enum Action {
 }
 export type AppSubjects = 'all' | Subjects<{
     'User': User,
-    'File': File
+    'File': File,
+    'Folder': Folder
 }>;
 export type AppAbility = PureAbility<[Action, AppSubjects], PrismaQuery>;
