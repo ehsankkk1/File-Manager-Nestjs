@@ -42,6 +42,11 @@ export class FolderService {
             },
         });
     }
+    async getAllFolders() {
+        const folder = await this.prisma.folder.findMany({
+        })
+        return folder;
+    }
     async addFolder(dto: AddFolderDto, user: User) {
         const folder = await this.prisma.folder.create({
             data: {
@@ -51,7 +56,7 @@ export class FolderService {
         })
         return folder;
     }
-    async deleteFolder(dto: DeleteFolderDto, user: User) {
+    async deleteFolder(dto: DeleteFolderDto) {
         //check if the folder exist
         try {
             return await this.prisma.folder.delete({
@@ -65,7 +70,7 @@ export class FolderService {
             }
         }
     }
-    async updateFolder(dto: UpdateFolderDto, folderId: number, user: User) {
+    async updateFolder(dto: UpdateFolderDto, folderId: number) {
         //check if the folder exist
         try {
             await this.prisma.folder.update({
@@ -82,31 +87,33 @@ export class FolderService {
             }
         }
     }
-    async addUserToFolder(dto: AddUserToFolderDto, user: User) {
-        //check if the folder exist
-        var folder = await this.prisma.folder.findUnique({
-            where: {
-                id: dto.folderId
+    async addUserToFolder(folderId: number, userId: number) {
+        await this.prisma.folderPermission.create({
+            data: {
+                userId: userId,
+                folderId: folderId
             }
         })
-        if (folder == null) {
-            return "Not Found"
-        }
-        //check if the user is the owner of the folder
-        else if (folder.userId == user.id) {
-            //add user to folder
-            await this.prisma.folder.update({
+
+    }
+    async removeUserFromFolder(folderId: number, userId: number) {
+        try {
+            const permission = await this.prisma.folderPermission.findFirst({
                 where: {
-                    id: dto.folderId
-                },
-                data: {
-                    //User:
+                    folderId: folderId,
+                    userId: userId
                 }
             });
-            return 'Updated Successfully';
+            return await this.prisma.folderPermission.delete({
+                where: {
+                    id: permission.id
+                }
+            })
+        } catch (e) {
+            if (e.code == 'P2025') {
+                throw new ForbiddenException("Folder not found");
+            }
         }
-        else {
-            return "You Cannot Update This Folder!"
-        }
+
     }
 }
