@@ -2,7 +2,7 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddFolderDto, AddUserToFolderDto, DeleteFolderDto, UpdateFolderDto } from './dto';
 import { User } from '@prisma/client';
@@ -16,6 +16,18 @@ export class FolderService {
             where: {
                 userId: user,
                 folderId: folder,
+            }
+        });
+        if (canUserAccess) {
+            return true;
+        }
+        return false;
+    }
+    async checkIfFolderCreator(user: number, folder: number): Promise<boolean> {
+        const canUserAccess = await this.prisma.folder.findFirst({
+            where: {
+                id: folder,
+                userId: user,
             }
         });
         if (canUserAccess) {
@@ -41,53 +53,33 @@ export class FolderService {
     }
     async deleteFolder(dto: DeleteFolderDto, user: User) {
         //check if the folder exist
-        var folder = await this.prisma.folder.findUnique({
-            where: {
-                id: dto.id
-            }
-        })
-        if (folder == null) {
-            return "Not Found"
-        }
-        //check if the user is the owner of the folder
-        else if (folder.userId == user.id) {
-            //delete folder
-            await this.prisma.folder.delete({
+        try {
+            return await this.prisma.folder.delete({
                 where: {
                     id: dto.id,
                 }
             });
-            return 'Deleted Successfully';
-        }
-        else {
-            return "You Cannot Delete This Folder!"
+        } catch (e) {
+            if (e.code == 'P2025') {
+                throw new ForbiddenException("Folder not found");
+            }
         }
     }
-    async updateFolder(dto: UpdateFolderDto, user: User) {
+    async updateFolder(dto: UpdateFolderDto, folderId: number, user: User) {
         //check if the folder exist
-        var folder = await this.prisma.folder.findUnique({
-            where: {
-                id: dto.id
-            }
-        })
-        if (folder == null) {
-            return "Not Found"
-        }
-        //check if the user is the owner of the folder
-        else if (folder.userId == user.id) {
-            //update folder
+        try {
             await this.prisma.folder.update({
                 where: {
-                    id: dto.id
+                    id: folderId
                 },
                 data: {
                     title: dto.name
                 }
             });
-            return 'Updated Successfully';
-        }
-        else {
-            return "You Cannot Update This Folder!"
+        } catch (e) {
+            if (e.code == 'P2025') {
+                throw new ForbiddenException("Folder not found");
+            }
         }
     }
     async addUserToFolder(dto: AddUserToFolderDto, user: User) {

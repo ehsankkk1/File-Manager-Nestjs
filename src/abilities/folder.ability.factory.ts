@@ -18,33 +18,24 @@ export class FolderAbilityFactory {
             can(Action.Manage, "Folder");
             return build();
         }
-
-        // check if the user is the owner of the folder
-        const havePermission = await this.folderService.checkFolderPermission(user.id, folderId);
-
         cannot(Action.Manage, "Folder");
+        can(Action.Create, "Folder");
+        can(Action.Read, "Folder");
 
-        if (havePermission) {
-            can(Action.Read, "Folder");
-            can(Action.Create, "Folder");
-            can(Action.Update, "Folder");
-        }
-
-        // check if there is folder id passed
-        if (!folderId) {
+        if(!folderId){
             return build();
         }
-        // add actions if folder is found
-        const getFolderById = await this.folderService.findById(folderId);
-        if (getFolderById) {
-            // only creator can delete the folder
-            if (getFolderById.userId === user.id) {
-                can(Action.Delete, "Folder");
-            }
-        } else {
-            throw new ForbiddenException("Folder not found");
-        }
 
+        // check if the user is the owner of the folder
+        const folderCreator = await this.folderService.checkIfFolderCreator(user.id, folderId);
+
+        if (folderCreator) {
+            can(Action.Update, "Folder");
+            can(Action.Delete, "Folder");
+            can(Action.Add, "Folder");
+            can(Action.Remove, "Folder");
+        }
+        
         return build();
     }
 }

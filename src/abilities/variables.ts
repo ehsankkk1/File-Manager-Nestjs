@@ -11,6 +11,8 @@ export enum Action {
     Delete = 'delete',
     CheckIn = 'checkIn',
     CheckOut = 'checkOut',
+    Add = 'add',
+    Remove = 'remove',
 }
 export type AppSubjects = 'all' | Subjects<{
     'User': User,
