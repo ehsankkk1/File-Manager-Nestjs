@@ -2,12 +2,18 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateFileDto, UpdateFileDto } from './dto';
+import { CreateFileDto } from './dto';
+import { UpdateFileDto } from './dto/updateFile.dto';
 import { FileEventService } from 'src/file-event/file-event.service';
 import { FileEventEnum } from 'src/file-event/enum';
+import { CheckAbilities } from 'src/abilities/decorator';
+import { Action } from 'src/abilities/variables';
+import { DefaultArgs } from '@prisma/client/runtime/library';
+import * as fs from 'fs';
+import { resolve } from 'path';
 
 @Injectable()
 export class FileService {
@@ -16,8 +22,8 @@ export class FileService {
     private fileEventService: FileEventService
   ) { }
 
-  async getFiles(folderId: number) {
-
+  //index
+  async getAll(folderId: number) {
     return this.prisma.file.findMany({
       where: {
         folderId: folderId,
@@ -26,96 +32,164 @@ export class FileService {
 
   }
 
-  findById(folderId: number,id: number) {
-    return this.prisma.file.findFirst({
-      where: {
-        id: id,
-        folderId: folderId,
-      },
-      include: {
-        fileEvent: true,
+  //show
+  async findById(id: number) {
+    try {
+      return this.prisma.file.findFirst({
+        where: {
+          id: id,
+        },
+        include: {
+          fileEvent: true,
+        }
+      });
+    }
+    catch (e) {
+      if (e.code == 'P2003') {
+        throw new NotFoundException("file not found");
       }
-    });
+    }
   }
 
-  async createFile(dto: CreateFileDto,folderId: number, link: string, user: User) {
-    const file = await this.prisma.file.create({
-      data: {
-        title: dto.title,
-        link: link,
-        user: {
-          connect: {
-            id: user.id,
+  //create
+  async create(dto: CreateFileDto, folderId: number, link: string, user: User) {
+    try {
+      let file = await this.prisma.file.create({
+        data: {
+          title: dto.title,
+          link: link,
+          user: {
+            connect: {
+              id: user.id,
+            }
+          },
+          folder: {
+            connect: {
+              id: folderId,
+            }
           }
         },
-        folder:{
-          connect:{
-            id: folderId,
-          }
-        }
-      },
-    })
-    return file;
+      })
+      await this.fileEventService.createFileEvent(FileEventEnum.Create, user, file.id);
+      return file;
+
+    } catch (e) {
+      return e.message;
+    }
   }
 
 
 
-  async updateFile(id: number, updateFileDto: UpdateFileDto, link: string, user: User) {
+  //update
+  async update(id: number, updateFileDto: UpdateFileDto, user: User, file: Express.Multer.File) {
     try {
       // create update event 
       await this.fileEventService.createFileEvent(FileEventEnum.Updated, user, id);
-
       //try to update the file if available 
+      const data: { title?: string; link?: string } = {};
+      if (updateFileDto.title) {
+        data.title = updateFileDto.title;
+      }
+      if (file) {
+        data.link = file.path;
+        const oldfile = this.findById(id);
+        const filePath = resolve((await oldfile).link);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        } else {
+          console.error(`File ${filePath} does not exist in uploads directory`);
+        }
+      }
       return await this.prisma.file.update({
         where: { id: id },
-        data: {
-          title: updateFileDto.title,
-          link: link,
-        },
+        data: data
       });
     } catch (e) {
-      if (e.code == 'P2025') {
-        throw new ForbiddenException("File not found");
+      if (e.code == 'P2003') {
+        throw new NotFoundException("file not found");
+      } else {
+        return e.message;
       }
     }
   }
 
-  async checkinfile(id: number, user: User) {
+  //delete
+  async delete(id: number, user: User) {
+    try {
+      await this.prisma.file.delete({
+        where: {
+          id: id,
+        }
+      });
+      await this.fileEventService.createFileEvent(FileEventEnum.Deleted, user, id);
+      return "file deleted successfully."
+    } catch (e) {
+      if (e.code == 'P2003') {
+        throw new NotFoundException("file not found");
+      }
+    }
+  }
 
+  //checkin user to a file
+  @CheckAbilities({ action: Action.CheckIn, subject: "File" })
+  async checkin(id: number, user: User) {
     //try to update the file if available 
     try {
-      const file = await this.prisma.file.update({
-        where: { id: Number(id) },
-        data: { isAvailable: false },
-      });
+      const file = this.checkinAction(this.prisma.file, id);
       await this.fileEventService.createFileEvent(FileEventEnum.CheckIn, user, id);
       return file;
     } catch (e) {
-      if (e.code == 'P2025') {
-        throw new ForbiddenException("File not found");
+      if (e.code == 'P2003') {
+        throw new NotFoundException("file not found");
       }
     }
   }
 
-  async checkoutfile(id: number, user: User) {
-    try{
-       const file = await this.prisma.file.update({
+  //checkin file
+  async checkinAction(file: Prisma.FileDelegate<DefaultArgs>, id: number) {
+    return await file.update({
       where: { id: Number(id) },
-      data: { isAvailable: true },
+      data: { isAvailable: false },
     });
-    await this.fileEventService.createFileEvent(FileEventEnum.CheckOut, user, id)
-    return file;
-    }catch (e) {
-      if (e.code == 'P2025') {
-        throw new ForbiddenException("File not found");
+  }
+
+
+  //checkin user into multiple files
+  async checkInFiles(user: User, fileIds: number[]) {
+    await this.prisma.$transaction(async (q) => {
+      for (const fileId of fileIds) {
+        let file = await q.file.findFirst({
+          where: { id: fileId },
+        });
+
+        //check if file is available
+        if (file.isAvailable == false) {
+          throw new ForbiddenException('all the files should be available for checking in');
+        }
+        else {
+          await this.checkinAction(q.file, fileId);
+        }
+      }
+    });
+    return "All files have been checked in successfully.";
+  }
+
+
+  //checkout
+  async checkout(id: number, user: User) {
+    try {
+      const file = await this.prisma.file.update({
+        where: { id: Number(id) },
+        data: { isAvailable: true },
+      });
+      await this.fileEventService.createFileEvent(FileEventEnum.CheckOut, user, id)
+      return file;
+    } catch (e) {
+      if (e.code == 'P2003') {
+        throw new NotFoundException("file not found");
       }
     }
   }
-
-  remove(id: number) {
-
-  }
-
 }
 
 

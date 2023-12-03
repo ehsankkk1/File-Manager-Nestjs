@@ -15,8 +15,8 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
-  email String @unique()
-  hash  String
+  email   String  @unique()
+  hash    String
   isAdmin Boolean @default(false)
 
   fullName String?
@@ -46,10 +46,10 @@ model FileEvent {
   eventName EventName
 
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   fileId Int
-  file   File @relation(fields: [fileId], references: [id])
+  file   File @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
   @@map("fileEvents")
 }
@@ -66,8 +66,8 @@ model File {
   fileEvent FileEvent[]
 
   userId   Int
-  user     User   @relation(fields: [userId], references: [id])
-  folder   Folder @relation(fields: [folderId], references: [id])
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId Int
 
   @@map("files")
@@ -84,7 +84,7 @@ model Folder {
   folderPermissions FolderPermission[]
 
   userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("folders")
 }
@@ -94,10 +94,10 @@ model FolderPermission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  folder   Folder @relation(fields: [folderId], references: [id])
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId Int
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
   @@map("folderPermissions")

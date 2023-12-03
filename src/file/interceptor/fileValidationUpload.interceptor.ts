@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { validate } from 'class-validator';
-import { CheckFileNotEmptyDto } from '../dto/checkFileNotEmpty.dto';
+import { CheckFileNotEmptyDto } from '../dto';
 
 @Injectable()
 export class FileValidationUploadInterceptor implements NestInterceptor {
@@ -35,8 +35,8 @@ export class FileValidationUploadInterceptor implements NestInterceptor {
             throw new BadRequestException({ message: 'Validation failed', errors: validationErrors });
         }
 
-          // check file size 
-          if (request.file.size > 3000000) {
+        // check file size 
+        if (request.file.size > 3000000) {
             throw new BadRequestException('File size exceeds maximum limit');
         }
 

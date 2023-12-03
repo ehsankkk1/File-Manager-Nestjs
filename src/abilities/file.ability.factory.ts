@@ -1,7 +1,7 @@
-import { AbilityBuilder, ExtractSubjectType, PureAbility } from "@casl/ability";
-import { ForbiddenException, Injectable, Logger } from "@nestjs/common";
+import { AbilityBuilder } from "@casl/ability";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { FileEvent, User } from "@prisma/client";
-import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
+import { createPrismaAbility } from '@casl/prisma';
 import { FolderService } from "src/folder/folder.service";
 import { Action, AppAbility } from "./variables";
 import { FileService } from "src/file/file.service";
@@ -37,7 +37,7 @@ export class FileAbilityFactory {
         }
 
         // add actions if file is found
-        const getFileById = await this.fileService.findById(folderId, fileId);
+        const getFileById = await this.fileService.findById(fileId);
         if (getFileById) {
             // only creator can delete the file
             if (getFileById.userId === user.id) {
@@ -53,7 +53,7 @@ export class FileAbilityFactory {
                 can(Action.CheckOut, "File");
             }
         } else {
-            throw new ForbiddenException("File not found");
+            throw new NotFoundException("File not found");
         }
 
         return build();
@@ -61,14 +61,11 @@ export class FileAbilityFactory {
 
     isTheCheckedInUser(user: User, events: FileEvent[]) {
         const updatedEvents = events.filter(event => event.eventName === FileEventEnum.CheckIn);
-
         // Sort updatedEvents by updatedAt in descending order
         updatedEvents.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
         // Get the userId of the first event (latest update)
         const lastUpdateUserId = updatedEvents[0]?.userId;
-        console.log("Last CheckedIn User ID:", lastUpdateUserId);
-
         if (lastUpdateUserId === user.id) {
             return true;
         }

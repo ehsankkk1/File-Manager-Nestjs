@@ -30,8 +30,8 @@ export class FileAbilityGuard implements CanActivate {
 
         // check for every rule and match with ability
         try {
-            rules.forEach((rule) =>
-                ForbiddenError.from(ability).throwUnlessCan(rule.action, rule.subject),
+            rules.forEach(function (rule) {
+                ForbiddenError.from(ability).throwUnlessCan(rule.action, rule.subject)}
             );
             return true;
         } catch (error) {

@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 import { User } from '@prisma/client';
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Res, Param, ParseIntPipe, Patch, Post, UseGuards, HttpStatus } from '@nestjs/common';
 import { AddFolderDto, DeleteFolderDto, UpdateFolderDto } from './dto';
 import { FolderService } from './folder.service';
 import { JwtGuard } from 'src/auth/guard';
@@ -13,29 +13,24 @@ import { Action } from 'src/abilities/variables';
 
 
 @UseGuards(JwtGuard)
-@Controller('myFolder')
+@Controller('folders')
 export class FolderController {
     constructor(private folderService: FolderService) { }
 
-    @Get('getAll')
+    @Get()
     @UseGuards(FolderAbilityGuard)
     @CheckAbilities({ action: Action.Create, subject: "Folder" })
     getAllFolders() {
-        return this.folderService.getAllFolders()
+        return this.folderService.getAllFolders();
     }
 
-    @Post('add')
+    @Post()
     @UseGuards(FolderAbilityGuard)
     @CheckAbilities({ action: Action.Create, subject: "Folder" })
-    addFolder(@Body() dto: AddFolderDto, @GetUser() user: User) {
+    addFolder(
+        @Body() dto: AddFolderDto,
+        @GetUser() user: User) {
         return this.folderService.addFolder(dto, user)
-    }
-
-    @Delete(':folderId')
-    @UseGuards(FolderAbilityGuard)
-    @CheckAbilities({ action: Action.Delete, subject: "Folder" })
-    async deleteFolder(@Body() dto: DeleteFolderDto, @GetUser() user: User) {
-        return this.folderService.deleteFolder(dto)
     }
 
     @Patch(':folderId')
@@ -49,17 +44,30 @@ export class FolderController {
         return this.folderService.updateFolder(dto, folderId);
     }
 
-    @Post(':userId/:folderId/addUser')
+
+    @Delete(':folderId')
+    @UseGuards(FolderAbilityGuard)
+    @CheckAbilities({ action: Action.Delete, subject: "Folder" })
+    async deleteFolder(@Param('folderId', ParseIntPipe) folderId: number) {
+        return this.folderService.deleteFolder(folderId);
+    }
+
+
+    @Post('/:folderId/add-user/:userId')
     @UseGuards(FolderAbilityGuard)
     @CheckAbilities({ action: Action.Add, subject: "Folder" })
-    addUserToFolder(@Param('folderId', ParseIntPipe) folderId: number, @Param('userId', ParseIntPipe) userId: number) {
+    addUserToFolder(
+        @Param('folderId', ParseIntPipe) folderId: number,
+        @Param('userId', ParseIntPipe) userId: number) {
         return this.folderService.addUserToFolder(folderId, userId)
     }
 
-    @Post(':userId/:folderId/removeUser')
+    @Delete('/:folderId/remove-user/:userId')
     @UseGuards(FolderAbilityGuard)
     @CheckAbilities({ action: Action.Remove, subject: "Folder" })
-    removeUserFromFolder(@Param('folderId', ParseIntPipe) folderId: number, @Param('userId', ParseIntPipe) userId: number) {
+    removeUserFromFolder(
+        @Param('folderId', ParseIntPipe) folderId: number,
+        @Param('userId', ParseIntPipe) userId: number) {
         return this.folderService.removeUserFromFolder(folderId, userId)
     }
 

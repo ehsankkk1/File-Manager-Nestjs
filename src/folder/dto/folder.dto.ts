@@ -1,12 +1,14 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class AddFolderDto {
     @IsString()
     @IsNotEmpty()
+    @ApiProperty()
     name: string
-
 }
+
 export class DeleteFolderDto {
     @IsInt()
     @Type(() => Number)

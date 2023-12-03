@@ -1,2 +1,1 @@
-export * from './createFile.dto';
-export * from './updateFile.dto';
+export * from './file.dto';
