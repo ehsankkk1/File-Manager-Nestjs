@@ -2,10 +2,11 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, HttpCode, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddFolderDto, AddUserToFolderDto, DeleteFolderDto, UpdateFolderDto } from './dto';
+import { AddFolderDto, UpdateFolderDto } from './dto';
 import { User } from '@prisma/client';
+import { ApiAcceptedResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class FolderService {
@@ -38,8 +39,7 @@ export class FolderService {
 
     //index
     async getAllFolders() {
-        return await this.prisma.folder.findMany({
-        })
+        return await this.prisma.folder.findMany({})
     }
 
     //show
@@ -59,8 +59,7 @@ export class FolderService {
                 title: dto.name,
                 userId: user.id
             }
-        })
-
+        });
         await this.prisma.folderPermission.create({
             data: {
                 userId: user.id,
@@ -83,9 +82,7 @@ export class FolderService {
                 }
             });
         } catch (e) {
-            if (e.code == 'P2003') {
-                throw new NotFoundException("Folder not found");
-            }
+            return e.message;
         }
     }
 
@@ -93,62 +90,44 @@ export class FolderService {
     async deleteFolder(folderId: number) {
         //check if the folder exist
         try {
-            await this.prisma.folder.delete({
+            return await this.prisma.folder.delete({
                 where: {
                     id: folderId,
                 }
             });
-            return "folder deleted successfully."
         } catch (e) {
-            if (e.code == 'P2003') {
+            if (e.code == 'P2025') {
                 throw new NotFoundException("Folder not found");
             }
         }
     }
 
     async addUserToFolder(folderId: number, userId: number) {
-        const exists = !!await this.prisma.folderPermission.findFirst(
-            {
-                where: {
+        try {
+            return await this.prisma.folderPermission.create({
+
+                data: {
                     folderId: folderId,
                     userId: userId
-
-                }
-            }
-        );
-        if (exists) { return "User already has this permission" }
-        else {
-            return await this.prisma.folderPermission.create({
-                data: {
-                    userId: userId,
-                    folderId: folderId
                 }
             })
+        } catch (e) {
+            // already exists code (unique restriction)
+            if (e.code == 'P2002') {
+                throw new ConflictException("User already have permission");
+            }
         }
-
     }
     async removeUserFromFolder(folderId: number, userId: number) {
         try {
-            const permission = await this.prisma.folderPermission.findFirst({
+            return await this.prisma.folderPermission.delete({
                 where: {
-                    folderId: folderId,
-                    userId: userId
+                    userId_folderId: { userId: userId, folderId: folderId },
                 }
             });
-            if (!(!!permission)) {
-                return "User doesn't have this permission"
-            }
-            else {
-                await this.prisma.folderPermission.delete({
-                    where: {
-                        id: permission.id
-                    }
-                })
-                return "permission deleted successfully"
-            }
         } catch (e) {
-            if (e.code == 'P2003') {
-                throw new NotFoundException("Folder not found");
+            if (e.code == 'P2025') {
+                throw new NotFoundException("Permission not found");
             }
         }
     }

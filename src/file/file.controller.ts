@@ -73,7 +73,7 @@ export class FileController {
     //update
     @Patch(':id')
     //@UseInterceptors(FileValidationUploadInterceptor)
-    @UseInterceptors(FileInterceptor('file', { }))
+    @UseInterceptors(FileInterceptor('file', {}))
     @UseGuards(FileAbilityGuard)
     @CheckAbilities({ action: Action.Update, subject: "File" })
     async updateFile(
@@ -85,7 +85,7 @@ export class FileController {
             fileIsRequired: false
         })) file?: Express.Multer.File
     ) {
-        return this.fileService.update(fileId, dto, user,file);
+        return this.fileService.update(fileId, dto, user, file);
     }
 
     //delete

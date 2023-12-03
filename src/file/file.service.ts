@@ -34,21 +34,14 @@ export class FileService {
 
   //show
   async findById(id: number) {
-    try {
-      return this.prisma.file.findFirst({
-        where: {
-          id: id,
-        },
-        include: {
-          fileEvent: true,
-        }
-      });
-    }
-    catch (e) {
-      if (e.code == 'P2003') {
-        throw new NotFoundException("file not found");
+    return this.prisma.file.findFirst({
+      where: {
+        id: id,
+      },
+      include: {
+        fileEvent: true,
       }
-    }
+    });
   }
 
   //create
@@ -122,11 +115,9 @@ export class FileService {
         }
       });
       await this.fileEventService.createFileEvent(FileEventEnum.Deleted, user, id);
-      return "file deleted successfully."
+      return { "message": "File deleted successfully." }
     } catch (e) {
-      if (e.code == 'P2003') {
-        throw new NotFoundException("file not found");
-      }
+      return e.message;
     }
   }
 
@@ -139,9 +130,7 @@ export class FileService {
       await this.fileEventService.createFileEvent(FileEventEnum.CheckIn, user, id);
       return file;
     } catch (e) {
-      if (e.code == 'P2003') {
-        throw new NotFoundException("file not found");
-      }
+      return e.message;
     }
   }
 
@@ -164,14 +153,14 @@ export class FileService {
 
         //check if file is available
         if (file.isAvailable == false) {
-          throw new ForbiddenException('all the files should be available for checking in');
+          throw new NotFoundException('All the files should be available for checking in');
         }
         else {
           await this.checkinAction(q.file, fileId);
         }
       }
     });
-    return "All files have been checked in successfully.";
+    return { "message": "All files have been checked in successfully." };
   }
 
 
@@ -185,9 +174,7 @@ export class FileService {
       await this.fileEventService.createFileEvent(FileEventEnum.CheckOut, user, id)
       return file;
     } catch (e) {
-      if (e.code == 'P2003') {
-        throw new NotFoundException("file not found");
-      }
+      return e.message;
     }
   }
 }

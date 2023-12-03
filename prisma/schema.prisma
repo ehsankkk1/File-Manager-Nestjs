@@ -100,5 +100,6 @@ model FolderPermission {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
+  @@unique([userId,folderId])
   @@map("folderPermissions")
 }
