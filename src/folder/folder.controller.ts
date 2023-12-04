@@ -19,9 +19,26 @@ export class FolderController {
 
     @Get()
     @UseGuards(FolderAbilityGuard)
-    @CheckAbilities({ action: Action.Create, subject: "Folder" })
+    @CheckAbilities({ action: Action.Read, subject: "Folder" })
     getAllFolders() {
         return this.folderService.getAllFolders();
+    }
+
+    @Get('canAccess')
+    @UseGuards(FolderAbilityGuard)
+    @CheckAbilities({ action: Action.Read, subject: "Folder" })
+    getFoldersCanAccess(@GetUser() user: User) {
+        return this.folderService.getFoldersCanAccess(user);
+    }
+
+    @Get(':folderId')
+    @UseGuards(FolderAbilityGuard)
+    @CheckAbilities({ action: Action.Update, subject: "Folder" })
+    getOneFolder(
+        @GetUser() user: User,
+        @Param('folderId', ParseIntPipe) folderId: number
+    ) {
+        return this.folderService.findById(folderId);
     }
 
     @Post()

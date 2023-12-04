@@ -21,7 +21,7 @@ export class FolderAbilityFactory {
         cannot(Action.Manage, "Folder");
         can(Action.Create, "Folder");
         can(Action.Read, "Folder");
-
+        
         if(!folderId){
             return build();
         }

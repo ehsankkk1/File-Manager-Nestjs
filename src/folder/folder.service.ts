@@ -41,6 +41,21 @@ export class FolderService {
     async getAllFolders() {
         return await this.prisma.folder.findMany({})
     }
+    
+    async getFoldersCanAccess(user: User) {
+        const myPermissions = await this.prisma.folderPermission.findMany({
+            where: {
+                userId: user.id,
+            },
+            select:{
+                folder: true,
+            }
+        });
+        // Extract list of folders
+        const folders = myPermissions.map(item => item.folder);
+
+        return folders;
+    }
 
     //show
     findById(folderId: number) {
