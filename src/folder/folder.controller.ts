@@ -24,7 +24,7 @@ export class FolderController {
         return this.folderService.getAllFolders();
     }
 
-    @Get('canAccess')
+    @Get('can-access')
     @UseGuards(FolderAbilityGuard)
     @CheckAbilities({ action: Action.Read, subject: "Folder" })
     getFoldersCanAccess(@GetUser() user: User) {

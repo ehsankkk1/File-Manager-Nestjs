@@ -6,7 +6,6 @@ import { ConflictException, HttpCode, HttpStatus, Injectable, Logger, NotFoundEx
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddFolderDto, UpdateFolderDto } from './dto';
 import { User } from '@prisma/client';
-import { ApiAcceptedResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class FolderService {
