@@ -27,6 +27,10 @@ export class FileService {
     return this.prisma.file.findMany({
       where: {
         folderId: folderId,
+      },
+      include: {
+        checkedInUser:true,
+        user: true
       }
     });
 
@@ -126,7 +130,7 @@ export class FileService {
   async checkin(id: number, user: User) {
     //try to update the file if available 
     try {
-      const file = this.checkinAction(this.prisma.file, id);
+      const file = this.checkinAction(this.prisma.file, id, user);
       await this.fileEventService.createFileEvent(FileEventEnum.CheckIn, user, id);
       return file;
     } catch (e) {
@@ -135,10 +139,10 @@ export class FileService {
   }
 
   //checkin file
-  async checkinAction(file: Prisma.FileDelegate<DefaultArgs>, id: number) {
+  async checkinAction(file: Prisma.FileDelegate<DefaultArgs>, id: number, user: User) {
     return await file.update({
       where: { id: Number(id) },
-      data: { isAvailable: false },
+      data: { isAvailable: false, checkedInUserId: user.id },
     });
   }
 
@@ -156,7 +160,7 @@ export class FileService {
           throw new NotFoundException('All the files should be available for checking in');
         }
         else {
-          await this.checkinAction(q.file, fileId);
+          await this.checkinAction(q.file, fileId, user);
         }
       }
     });
@@ -169,7 +173,7 @@ export class FileService {
     try {
       const file = await this.prisma.file.update({
         where: { id: Number(id) },
-        data: { isAvailable: true },
+        data: { isAvailable: true, checkedInUserId: null },
       });
       await this.fileEventService.createFileEvent(FileEventEnum.CheckOut, user, id)
       return file;

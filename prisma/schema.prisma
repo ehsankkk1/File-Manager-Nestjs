@@ -22,7 +22,8 @@ model User {
   fullName String?
 
   fileEvents        FileEvent[]
-  files             File[]
+  files             File[]             @relation("files_user_created")
+  checkedInFiles    File[]             @relation("files_user_checkedIn")
   folders           Folder[]
   folderPermissions FolderPermission[]
 
@@ -65,8 +66,12 @@ model File {
 
   fileEvent FileEvent[]
 
-  userId   Int
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation("files_user_created", fields: [userId], references: [id], onDelete: Cascade)
+
+  checkedInUserId Int?
+  checkedInUser   User? @relation("files_user_checkedIn", fields: [checkedInUserId], references: [id], onDelete: Cascade)
+
   folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId Int
 
@@ -100,6 +105,6 @@ model FolderPermission {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
-  @@unique([userId,folderId])
+  @@unique([userId, folderId])
   @@map("folderPermissions")
 }
