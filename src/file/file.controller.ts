@@ -112,16 +112,6 @@ export class FileController {
         return this.fileService.delete(id, user);
     }
 
-
-    //download file
-    @Get('download')
-    downloadFile(@Res() res: any, @Body() body: any) {
-        if (body.path) {
-            return res.sendFile(body.path);
-        }
-    }
-
-
     //checkin file
     @Patch(':id/checkin')
     @UseGuards(FileAbilityGuard)
