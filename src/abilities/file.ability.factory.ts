@@ -49,7 +49,7 @@ export class FileAbilityFactory {
                 return build();
             }
             if (!getFileById.isAvailable
-                && this.isTheCheckedInUser(user, getFileById.fileEvent)) {
+                && user.id === getFileById.checkedInUserId) {
                 can(Action.CheckOut, "File");
             }
         } else {
@@ -59,16 +59,16 @@ export class FileAbilityFactory {
         return build();
     }
 
-    isTheCheckedInUser(user: User, events: FileEvent[]) {
-        const updatedEvents = events.filter(event => event.eventName === FileEventEnum.CheckIn);
-        // Sort updatedEvents by updatedAt in descending order
-        updatedEvents.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    // isTheCheckedInUser(user: User, events: FileEvent[]) {
+    //     const updatedEvents = events.filter(event => event.eventName === FileEventEnum.CheckIn);
+    //     // Sort updatedEvents by updatedAt in descending order
+    //     updatedEvents.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
-        // Get the userId of the first event (latest update)
-        const lastUpdateUserId = updatedEvents[0]?.userId;
-        if (lastUpdateUserId === user.id) {
-            return true;
-        }
-        return false;
-    }
+    //     // Get the userId of the first event (latest update)
+    //     const lastUpdateUserId = updatedEvents[0]?.userId;
+    //     if (lastUpdateUserId === user.id) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 }

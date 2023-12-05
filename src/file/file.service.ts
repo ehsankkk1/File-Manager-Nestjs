@@ -30,7 +30,9 @@ export class FileService {
       },
       include: {
         checkedInUser:true,
-        user: true
+        user: true,
+        fileEvent: true,
+        
       }
     });
 
