@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { LoggingInterceptor } from './global/interceptor/globalLogger.interceptor';
+import * as express from 'express';
+import { join } from 'path';
 
 async function bootstrap() {
 
@@ -12,6 +14,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
   app.useGlobalInterceptors(new LoggingInterceptor());
   await app.listen(3333);
   const server = app.getHttpServer();

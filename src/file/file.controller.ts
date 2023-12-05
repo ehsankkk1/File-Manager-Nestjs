@@ -14,6 +14,8 @@ import { Action } from 'src/abilities/variables';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors';
 import { FileValidationUploadInterceptor } from './interceptor/fileValidationUpload.interceptor';
 import { UpdateFileDto } from './dto/updateFile.dto';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @UseGuards(JwtGuard)
 @Controller('folders/:folderId/files/')
@@ -46,7 +48,18 @@ export class FileController {
     // create
     @Post()
     @UseInterceptors(FileValidationUploadInterceptor)
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: './uploads',
+            filename: (req, file, callback) => {
+                const uniqueSuffix =
+                    Date.now() + '-' + Math.round(Math.random() * 1e9);
+                const ext = extname(file.originalname);
+                const filename = uniqueSuffix + ext;
+                callback(null, filename);
+            }
+        }),
+    }))
     @UseGuards(FileAbilityGuard)
     @CheckAbilities({ action: Action.Create, subject: "File" })
     async uploadFile(
