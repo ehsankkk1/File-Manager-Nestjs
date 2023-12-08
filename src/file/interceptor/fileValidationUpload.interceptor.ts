@@ -36,7 +36,7 @@ export class FileValidationUploadInterceptor implements NestInterceptor {
         }
 
         // check file size 
-        if (request.file.size > 3000000) {
+        if (request.file.size > 300000000) {
             throw new BadRequestException('File size exceeds maximum limit');
         }
 

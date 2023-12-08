@@ -88,7 +88,8 @@ export class FileController {
     //@UseInterceptors(FileValidationUploadInterceptor)
     @UseInterceptors(FileInterceptor('file', {}))
     @UseGuards(FileAbilityGuard)
-    @CheckAbilities({ action: Action.Update, subject: "File" })
+    @CheckAbilities({ action: Action.Update, subject: "File" },
+    { action: Action.CheckOut, subject: "File" })
     async updateFile(
         @GetUser() user: User,
         @Param('id', ParseIntPipe) fileId: number,

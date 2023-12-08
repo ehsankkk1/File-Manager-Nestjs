@@ -25,6 +25,9 @@ export class FileService {
   //index
   async getAll(folderId: number) {
     return this.prisma.file.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
       where: {
         folderId: folderId,
       },
