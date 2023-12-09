@@ -31,6 +31,13 @@ export class FolderController {
         return this.folderService.getFoldersCanAccess(user);
     }
 
+    @Get('my-folders')
+    @UseGuards(FolderAbilityGuard)
+    @CheckAbilities({ action: Action.Read, subject: "Folder" })
+    getMyFolders(@GetUser() user: User) {
+        return this.folderService.getMyFolders(user);
+    }
+
     @Get(':folderId')
     @UseGuards(FolderAbilityGuard)
     @CheckAbilities({ action: Action.Update, subject: "Folder" })

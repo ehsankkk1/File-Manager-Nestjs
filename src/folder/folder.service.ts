@@ -56,6 +56,15 @@ export class FolderService {
         return folders;
     }
 
+    async getMyFolders(user: User) {
+        const myFolders = await this.prisma.folder.findMany({
+            where: {
+                userId: user.id,
+            },
+        });
+        return myFolders;
+    }
+
     //show
     findById(folderId: number) {
         return this.prisma.folder.findFirst({
