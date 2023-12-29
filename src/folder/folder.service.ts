@@ -141,13 +141,13 @@ export class FolderService {
         }
     }
 
-    async addUserToFolder(folderId: number, userId: number) {
+    async addUserToFolder(folderId: number, email: string) {
+        const user = await this.getUserByEmail(email)
         try {
             return await this.prisma.folderPermission.create({
-
                 data: {
                     folderId: folderId,
-                    userId: userId
+                    userId: user.id,
                 }
             })
         } catch (e) {
@@ -168,6 +168,18 @@ export class FolderService {
             if (e.code == 'P2025') {
                 throw new NotFoundException("Permission not found");
             }
+        }
+    }
+    async getUserByEmail(email: string){
+        const user = await this.prisma.user.findFirst({
+            where: {
+                email: email
+            }
+        });
+        if(user){
+            return user;
+        }else{
+            throw new NotFoundException("User not found");
         }
     }
 }

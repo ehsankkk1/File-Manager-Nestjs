@@ -75,15 +75,8 @@ export class FolderController {
     async deleteFolder(@Param('folderId', ParseIntPipe) folderId: number) {
         return this.folderService.deleteFolder(folderId);
     }
-    
-    @Post('/:folderId/add-user/:userId')
-    @UseGuards(FolderAbilityGuard)
-    @CheckAbilities({ action: Action.Add, subject: "Folder" })
-    addUserToFolder(
-        @Param('folderId', ParseIntPipe) folderId: number,
-        @Param('userId', ParseIntPipe) userId: number) {
-        return this.folderService.addUserToFolder(folderId, userId)
-    }
+
+
 
     @Get('/:folderId/users')
     @UseGuards(FolderAbilityGuard)
@@ -93,7 +86,16 @@ export class FolderController {
         @GetUser() user: User) {
         return this.folderService.getFolderAllUsers(folderId ,user);
     }
-    
+
+    @Post('/:folderId/add-user/:email')
+    @UseGuards(FolderAbilityGuard)
+    @CheckAbilities({ action: Action.Add, subject: "Folder" })
+    addUserToFolder(
+        @Param('folderId', ParseIntPipe) folderId: number,
+        @Param('email') email: string) {
+        return this.folderService.addUserToFolder(folderId, email)
+    }
+
     @Delete('/:folderId/remove-user/:userId')
     @UseGuards(FolderAbilityGuard)
     @CheckAbilities({ action: Action.Remove, subject: "Folder" })
