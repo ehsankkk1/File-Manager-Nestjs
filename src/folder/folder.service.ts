@@ -2,7 +2,7 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { ConflictException, HttpCode, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddFolderDto, UpdateFolderDto } from './dto';
 import { User } from '@prisma/client';
@@ -54,6 +54,22 @@ export class FolderService {
         const folders = myPermissions.map(item => item.folder);
 
         return folders;
+    }
+
+    async getFolderAllUsers(folderId:number, user: User) {
+        console.log("Folders adsfklnfksdnaskdnfkas")
+        const myPermissions = await this.prisma.folderPermission.findMany({
+            where: {
+                folderId: folderId,
+            },
+            select:{
+                user: true,
+            }
+        });
+        // Extract list of folders
+        const users = myPermissions.map(item => item.user);
+
+        return users;
     }
 
     async getMyFolders(user: User) {
