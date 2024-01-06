@@ -28,7 +28,6 @@ export class FileAbilityFactory {
         if (havePermission) {
             can(Action.Read, "File");
             can(Action.Create, "File");
-            can(Action.Update, "File");
         }
 
         // check if there is file id passed
@@ -51,6 +50,7 @@ export class FileAbilityFactory {
             if (!getFileById.isAvailable
                 && user.id === getFileById.checkedInUserId) {
                 can(Action.CheckOut, "File");
+                can(Action.Update, "File");
             }
         } else {
             throw new NotFoundException("File not found");

@@ -98,8 +98,7 @@ export class FileController {
             }
         }),
     }))    @UseGuards(FileAbilityGuard)
-    @CheckAbilities({ action: Action.Update, subject: "File" },
-    { action: Action.CheckOut, subject: "File" })
+    @CheckAbilities({ action: Action.Update, subject: "File" })
     async updateFile(
         @GetUser() user: User,
         @Param('id', ParseIntPipe) fileId: number,
