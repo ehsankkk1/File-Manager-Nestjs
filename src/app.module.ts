@@ -7,6 +7,8 @@ import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { AbilitiesModule } from './abilities/abilities.module';
 import { FileEventModule } from './file-event/file-event.module';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 @Module({
   imports: [
     FolderModule,
@@ -15,10 +17,21 @@ import { FileEventModule } from './file-event/file-event.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 5, // seconds
+      max: 10, // maximum number of items in cache
+    }),    
     UserModule,
     FileModule,
     AbilitiesModule,
     FileEventModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
   ],
 })
 export class AppModule { }
