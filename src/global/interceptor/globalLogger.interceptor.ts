@@ -5,7 +5,6 @@ import {
     NestInterceptor,
     ExecutionContext,
     CallHandler,
-    BadGatewayException,
     Logger,
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';

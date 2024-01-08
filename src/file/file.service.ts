@@ -162,13 +162,14 @@ export class FileService {
         let file = await q.file.findFirst({
           where: { id: fileId },
         });
-
         //check if file is available
         if (file.isAvailable == false) {
           throw new NotFoundException('All the files should be available for checking in');
         }
         else {
           await this.checkinAction(q.file, fileId, user);
+          await this.fileEventService.createFileEvent(FileEventEnum.CheckIn, user, fileId);
+
         }
       }
     });
