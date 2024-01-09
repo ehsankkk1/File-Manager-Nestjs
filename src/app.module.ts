@@ -29,11 +29,11 @@ import { ScheduleModule } from '@nestjs/schedule';
     AbilitiesModule,
     FileEventModule,
   ],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
-  ],
+  // providers: [
+  //   {
+  //     provide: APP_INTERCEPTOR,
+  //     useClass: CacheInterceptor,
+  //   },
+  // ],
 })
 export class AppModule { }

@@ -40,13 +40,13 @@ export class FolderService {
     async getAllFolders() {
         return await this.prisma.folder.findMany({})
     }
-    
+
     async getFoldersCanAccess(user: User) {
         const myPermissions = await this.prisma.folderPermission.findMany({
             where: {
                 userId: user.id,
             },
-            select:{
+            select: {
                 folder: true,
             }
         });
@@ -56,29 +56,32 @@ export class FolderService {
         return folders;
     }
 
-    async getFolderAllUsers(folderId:number, user: User) {
-        console.log("Folders adsfklnfksdnaskdnfkas")
+    async getFolderAllUsers(folderId: number, user: User) {
         const myPermissions = await this.prisma.folderPermission.findMany({
             where: {
                 folderId: folderId,
             },
-            select:{
+            select: {
                 user: true,
             }
         });
         // Extract list of folders
         const users = myPermissions.map(item => item.user);
-
-        return users;
+        const filteredData = users.filter(user => user.id !== 1);
+        
+        return filteredData;
     }
 
     async getMyFolders(user: User) {
-        const myFolders = await this.prisma.folder.findMany({
-            where: {
-                userId: user.id,
-            },
-        });
-        return myFolders;
+        if (user.isAdmin) {
+            return await this.prisma.folder.findMany({});
+        } else {
+            return await this.prisma.folder.findMany({
+                where: {
+                    userId: user.id,
+                },
+            });
+        }
     }
 
     //show
@@ -102,6 +105,13 @@ export class FolderService {
         await this.prisma.folderPermission.create({
             data: {
                 userId: user.id,
+                folderId: folder.id
+            }
+        })
+        // add admin to folder permissions
+        await this.prisma.folderPermission.create({
+            data: {
+                userId : 1,
                 folderId: folder.id
             }
         })
@@ -170,15 +180,15 @@ export class FolderService {
             }
         }
     }
-    async getUserByEmail(email: string){
+    async getUserByEmail(email: string) {
         const user = await this.prisma.user.findFirst({
             where: {
                 email: email
             }
         });
-        if(user){
+        if (user) {
             return user;
-        }else{
+        } else {
             throw new NotFoundException("User not found");
         }
     }
