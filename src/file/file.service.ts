@@ -14,6 +14,7 @@ import { Action } from 'src/abilities/variables';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import * as fs from 'fs';
 import { resolve } from 'path';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class FileService {
@@ -32,7 +33,7 @@ export class FileService {
         folderId: folderId,
       },
       include: {
-        checkedInUser:true,
+        checkedInUser: true,
         user: true,
         fileEvent: {
           include: {
@@ -148,9 +149,14 @@ export class FileService {
 
   //checkin file
   async checkinAction(file: Prisma.FileDelegate<DefaultArgs>, id: number, user: User) {
+    const currentDate = new Date(Date.now());
     return await file.update({
       where: { id: Number(id) },
-      data: { isAvailable: false, checkedInUserId: user.id },
+      data: {
+        isAvailable: false,
+        checkedInUserId: user.id,
+        checkedInAt: currentDate
+      },
     });
   }
 
@@ -190,6 +196,41 @@ export class FileService {
       return e.message;
     }
   }
+
+
+  @Cron(CronExpression.EVERY_DAY_AT_7AM)
+  async checkFileStatuses() {
+    const checkedInFiles = await this.prisma.file.findMany({
+      where: {
+        isAvailable: false,
+      },
+      include: {
+        fileEvent: true,
+        checkedInUser: true
+      }, // Include file events for each file
+    });
+
+    for (const file of checkedInFiles) {
+      const tenDaysAgo = new Date();
+      tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+
+      if (file.checkedInAt < tenDaysAgo) {
+        await this.prisma.file.update({
+          where: { id: file.id },
+          data: {
+            isAvailable: true,
+            checkedInUserId: null
+          },
+        });
+
+        // Create a new file event for the automatic checkout
+        this.fileEventService.createFileEvent(FileEventEnum.checkOut_automatic, file.checkedInUser, file.checkedInUserId);
+      }
+    }
+  }
+
 }
+
+
 
 

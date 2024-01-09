@@ -9,8 +9,10 @@ import { AbilitiesModule } from './abilities/abilities.module';
 import { FileEventModule } from './file-event/file-event.module';
 import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     FolderModule,
     AuthModule,
     PrismaModule,

@@ -6,4 +6,5 @@ export enum FileEventEnum {
     Create = 'created',
     CheckIn = 'checkedin',
     CheckOut = 'checkedout',
+    checkOut_automatic = 'checkedout_automatic',
 }

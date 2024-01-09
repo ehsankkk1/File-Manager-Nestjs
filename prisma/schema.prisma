@@ -36,6 +36,7 @@ enum EventName {
   created
   checkedin
   checkedout
+  checkedout_automatic
 }
 
 model FileEvent {
@@ -70,10 +71,10 @@ model File {
   user   User @relation("files_user_created", fields: [userId], references: [id], onDelete: Cascade)
 
   checkedInUserId Int?
-  checkedInUser   User? @relation("files_user_checkedIn", fields: [checkedInUserId], references: [id], onDelete: Cascade)
-
-  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId Int
+  checkedInUser   User?     @relation("files_user_checkedIn", fields: [checkedInUserId], references: [id], onDelete: Cascade)
+  checkedInAt     DateTime?
+  folder          Folder    @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId        Int
 
   @@map("files")
 }
