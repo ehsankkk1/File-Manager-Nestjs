@@ -22,9 +22,37 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Usage
+1) Authentication:
+Ensure that users are authenticated before accessing the file manager. You can customize the authentication strategy in the auth.guard.ts file.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+2) User Access Control:
+The application utilizes CASL abilities to control user access to folders and files. Update the casl-abilities.ts file to define the access rules according to your requirements.
+
+3) Check-in and Check-out:
+To prevent concurrent edits, the application supports the check-in and check-out mechanism. Users must check out a file before editing and check it back in after making changes. Check-out and check-in functionality is implemented in the checkin.service.ts file.
+
+4) Download Files:
+Users can download files using the provided download functionality. Customize the download route and logic in the download.controller.ts file.
+
+5) Alot more features check the screenshots below or the code for more details.
+
+# Screenshots
+
+## Auth Feature
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/bea5840c-6290-4435-98c0-a04f971ff4ba" width="300" >
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/c83d1b0a-d5bd-41b9-a694-67084aa35335" width="300" >
+
+## Files Feature
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/4d39c922-777b-42cc-a71b-84abf3795d8b" width="300" >
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/c70b4e79-3156-4ca6-ba62-a54cf6d268b3" width="300" >
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/45eda6f1-c7e1-4789-b833-09de00ec5176" width="300" >
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/fafa953f-8927-40bc-8a4d-ceb8e65666fc" width="300" >
+
+## Folder Feature
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/bc9c48d5-465b-402c-8793-e51815b5633e" width="300" >
+<img src="https://github.com/ehsankkk1/File-Manager-Flutter/assets/102434828/80ebebb6-b4a0-48fb-aa25-d159885e7e79"width="300" >
+
 
 ## Installation
 
